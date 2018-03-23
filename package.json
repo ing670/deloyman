@@ -1,16 +1,19 @@
 {
-  "name": "deloyman",
-  "version": "0.1.1",
+  "name": "deployman",
+  "version": "0.1.5",
   "description": "a deloy tool",
   "author": "ing670@163.com",
   "dependencies": {
     "commander": "^2.15.1",
     "fs-extra": "^5.0.0",
-    "ftp-deploy": "^1.2.2",
-    "scp2": "^0.5.0"
+    "scp2": "^0.5.0",
+    "jsftp": "2.0.x",
+    "async": "2.x.x",
+    "minimatch": "3.0.4",
+    "read": "1.0.7"
   },
   "bin": {
-    "deloyman": "./main.js"
+    "deployman": "./main.js"
   },
   "repository": {
     "type": "git",
