@@ -1,15 +1,15 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 var program = require('commander')
 var fsExtra = require('fs-extra')
 var path = require('path')
 var Deployer = require('./deployer')
 var client = require('scp2')
 try{
-	var config = require(path.resolve(__dirname,'../../dmconfig.js'))
+        var config = require(path.resolve(__dirname,'../../dmconfig.js'))
 }catch(e){
   console.log(e)
-	console.log("请在当前目录建立dmconfig.js配置文件")
-	return
+        console.log("请在当前目录建立dmconfig.js配置文件")
+        return
 }
 
 program
