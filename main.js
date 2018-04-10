@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 var program = require('commander')
 var fsExtra = require('fs-extra')
 var path = require('path')
