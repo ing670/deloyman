@@ -109,7 +109,7 @@ const Deployer = function () {
 		let remoteFilePath = path.join(remoteRoot, partialFilePath);
 		const fullLocalPath = path.join(localRoot, partialFilePath);
 		uploading(partialFilePath)
-		console.log("uploading...",remoteFilePath)
+		console.log("uploading...",fullLocalPath)
 		try {
 			client.scp(fullLocalPath, thisDeployer.config.username + ':' + thisDeployer.config.password + '@' + thisDeployer.config.host + ':' + remoteFilePath, function (err) {
 			  err && console.log(err)

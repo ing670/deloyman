@@ -4,14 +4,13 @@ var fsExtra = require('fs-extra')
 var path = require('path')
 var Deployer = require('./deployer')
 var client = require('scp2')
-try{
-        var config = require(path.resolve(__dirname,'../../dmconfig.js'))
-}catch(e){
-  console.log(e)
-        console.log("请在当前目录建立dmconfig.js配置文件")
-        return
+console.log('当前工作目录', process.cwd())
+try {
+  var config = require(path.join(process.cwd(), 'dmconfig.js'))
+} catch (e) {
+  console.log("请在当前目录建立dmconfig.js配置文件")
+  return
 }
-
 program
   .version('0.0.1')
   .description('一个支持ftp与sftp服务的发布工具 ')
