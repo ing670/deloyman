@@ -10,7 +10,8 @@
     "jsftp": "2.0.x",
     "minimatch": "3.0.4",
     "read": "1.0.7",
-    "scp2": "^0.5.0"
+    "scp2": "^0.5.0",
+    "ssh2-sftp-client": "^2.3.0"
   },
   "bin": {
     "deployman": "./main.js"
@@ -20,7 +21,9 @@
     "url": "https://github.com/ing670/deloyman.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "deployman test test",
+    "ftptest": "deployman ftp dev"
+
   },
   "license": "MIT"
 }

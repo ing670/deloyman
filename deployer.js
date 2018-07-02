@@ -37,7 +37,7 @@ const Deployer = function () {
 
 		if (include.length > 0) {
 			for (i = 0; i < include.length; i++) {
-				if (minimatch(filePath, include[i], {matchBase: true})) {
+				if (minimatch(filePath, include[i], { matchBase: true })) {
 					return true;
 				}
 			}
@@ -46,7 +46,7 @@ const Deployer = function () {
 
 		if (exclude.length > 0) {
 			for (i = 0; i < exclude.length; i++) {
-				if (minimatch(filePath, exclude[i], {matchBase: true})) {
+				if (minimatch(filePath, exclude[i], { matchBase: true })) {
 					return false;
 				}
 			}
@@ -105,23 +105,31 @@ const Deployer = function () {
 
 		return result;
 	}
-	function sftpPut(partialFilePath, cb){
-		let remoteFilePath = path.join(remoteRoot, partialFilePath);
-		const fullLocalPath = path.join(localRoot, partialFilePath);
-		uploading(partialFilePath)
-		console.log("uploading...",fullLocalPath)
-		try {
-			client.scp(fullLocalPath, thisDeployer.config.username + ':' + thisDeployer.config.password + '@' + thisDeployer.config.host + ':' + remoteFilePath, function (err) {
-			  err && console.log(err)
-			  err || cb()
+	function sftpPut(gp, cb) {
+		let count = 0
+		gp.forEach((partialFilePath) => {
+			let remoteFilePath = path.join(remoteRoot, partialFilePath);
+			const fullLocalPath = path.join(localRoot, partialFilePath);
+			uploading(partialFilePath)
+			console.log("uploading...", partialFilePath)
+			try {
+				client.scp(fullLocalPath, thisDeployer.config.username + ':' + thisDeployer.config.password + '@' + thisDeployer.config.host + ':' + remoteFilePath, function (err) {
+					err && console.log(err)
+					if (!err) {
+						count++
+					}
+					if (count == gp.length) {
+						cb()
+					}
+				})
+			} catch (e) {
+				console.log(e)
+			}
+		})
 
-			})
-		  } catch (e) {
-			console.log(e)
-		  }
 	}
-	function uploading(partialFilePath){
-		
+	function uploading(partialFilePath) {
+
 
 		const emitData = {
 			totalFileCount: partialFilePaths.length,
@@ -135,11 +143,13 @@ const Deployer = function () {
 	}
 	// A method for uploading a single file
 	function ftpPut(partialFilePath, cb) {
+
 		let remoteFilePath = remoteRoot + '/' + partialFilePath;
 		remoteFilePath = remoteFilePath.replace(/\\/g, '/');
 
 		const fullLocalPath = path.join(localRoot, partialFilePath);
 		let emitData = uploading(partialFilePath)
+		console.log("uploading...", partialFilePath)
 		ftp.put(fullLocalPath, remoteFilePath, err => {
 			if (err) {
 				emitData.err = err;
@@ -165,17 +175,17 @@ const Deployer = function () {
 		});
 	}
 
-  // A method for changing the remote working directory and creating one if it doesn't already exist
+	// A method for changing the remote working directory and creating one if it doesn't already exist
 	function ftpMakeRemoteDirectoryIfNeeded(partialRemoteDirectory, cb) {
-    // Add the remote root, and clean up the slashes
+		// Add the remote root, and clean up the slashes
 		let fullRemoteDirectory = remoteRoot + '/' + partialRemoteDirectory.replace(/\\/gi, '/');
 
-    // Add leading slash if it is missing
+		// Add leading slash if it is missing
 		if (fullRemoteDirectory.charAt(0) !== '/') {
 			fullRemoteDirectory = '/' + fullRemoteDirectory;
 		}
 
-    // Remove double // if present
+		// Remove double // if present
 		fullRemoteDirectory = fullRemoteDirectory.replace(/\/\//g, '/');
 		ftp.raw('cwd', fullRemoteDirectory, (err) => {
 			if (err) {
@@ -193,12 +203,12 @@ const Deployer = function () {
 	}
 
 	this.deploy = function (config, cb) {
-	// Prompt for password if none was given
+		// Prompt for password if none was given
 		thisDeployer.config = config
 		if (config.password) {
 			configComplete(config, cb);
 		} else {
-			read({prompt: 'Password for ' + config.username + '@' + config.host + ' (ENTER for none): ', default: '', silent: true}, (err, res) => {
+			read({ prompt: 'Password for ' + config.username + '@' + config.host + ' (ENTER for none): ', default: '', silent: true }, (err, res) => {
 				if (err) {
 					return cb(err);
 				}
@@ -209,8 +219,8 @@ const Deployer = function () {
 	};
 
 	function configComplete(config, cback) {
-	// Init
-	config.protocol == "ftp"&&(ftp = new Ftp({
+		// Init
+		config.protocol == "ftp" && (ftp = new Ftp({
 			host: config.host,
 			port: config.port
 		}))
@@ -223,18 +233,24 @@ const Deployer = function () {
 		exclude = config.exclude || exclude;
 		include = config.include || include;
 
-		config.protocol == "ftp"&&(ftp.useList = true);
+		config.protocol == "ftp" && (ftp.useList = true);
 		dirParseSync(localRoot);
 
-    // Authentication and main processing of files
-	config.protocol == "ftp" && ftp.auth(config.username, config.password, err => {
+		// Authentication and main processing of files
+		var gp = []
+		partialFilePaths.forEach((el, index) => {
+			if (!gp[parseInt(index / 5)])
+				gp[parseInt(index / 5)] = []
+			gp[parseInt(index / 5)].push(el)
+		})
+		config.protocol == "ftp" && ftp.auth(config.username, config.password, err => {
 			if (err) {
 				cback(err);
 			} else {
 				ftpMakeDirectoriesIfNeeded(err => {
 					if (err) {
-            // If there was an error creating a remote directory we can't continue to upload files
-					cback(err);
+						// If there was an error creating a remote directory we can't continue to upload files
+						cback(err);
 					} else {
 						async.eachSeries(partialFilePaths, ftpPut, err => {
 							if (err) {
@@ -250,13 +266,13 @@ const Deployer = function () {
 				});
 			}
 		});
-		config.protocol == "sftp" && async.eachSeries(partialFilePaths, sftpPut, err => {
-							if (err) {
-								cback(err);
-							}else{
-								cback();
-							}
-							
+		config.protocol == "sftp" && async.eachSeries(gp, sftpPut, err => {
+			if (err) {
+				cback(err);
+			} else {
+				cback();
+			}
+
 		});
 	}
 };
