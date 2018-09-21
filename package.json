@@ -1,6 +1,6 @@
 {
   "name": "deployman",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "a deloy tool",
   "author": "ing670@163.com",
   "dependencies": {
@@ -10,7 +10,7 @@
     "jsftp": "2.0.x",
     "minimatch": "3.0.4",
     "read": "1.0.7",
-    "scp2": "^0.5.0",
+    "scp2": "^0.5.0"
   },
   "bin": {
     "deployman": "./main.js"

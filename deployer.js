@@ -239,9 +239,9 @@ const Deployer = function () {
 		// Authentication and main processing of files
 		var gp = []
 		partialFilePaths.forEach((el, index) => {
-			if (!gp[parseInt(index / 5)])
-				gp[parseInt(index / 5)] = []
-			gp[parseInt(index / 5)].push(el)
+			if (!gp[parseInt(index / 3)])
+				gp[parseInt(index / 3)] = []
+			gp[parseInt(index / 3)].push(el)
 		})
 		config.protocol == "ftp" && ftp.auth(config.username, config.password, err => {
 			if (err) {
